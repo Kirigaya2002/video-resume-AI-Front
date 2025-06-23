@@ -37,20 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Simulate a call to the backend API
-                const response = await fetch('https://localhost:5000/process-video', {
+                const response = await fetch('http://localhost:5000/process-video', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ video: base64 })
+                    body: JSON.stringify({ Video: base64 })
                 });
 
                 if (!response.ok) {
-                    // Alerta de error de servidor
+                    console.log("error de servidor")
                 }
 
                 const data = await response.json();
-                summary.value = data.summary;
+                console.log("si es ", data.resumed_text);
+                summary.value = data.resumed_text;
                 alertSuccess.style.display = 'block';
 
             } catch (error) {
@@ -61,6 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnDownload.addEventListener('click', () => {
+        hideAlerts();
+        
+        const summaryText = summary.value;
+        const blob = new Blob([summaryText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
 
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'video_resumen.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     });
 });
