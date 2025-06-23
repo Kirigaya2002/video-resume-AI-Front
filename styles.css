@@ -22,3 +22,7 @@
     opacity: 0;
     cursor: pointer;
 }
+
+#alert-empty, #alert-bad-format, #alert-success {
+    display: none;
+}
