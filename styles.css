@@ -23,6 +23,12 @@
     cursor: pointer;
 }
 
+#file-p {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #000000;
+}
+
 #alert-empty, #alert-bad-format, #alert-success {
     display: none;
 }

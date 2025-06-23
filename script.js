@@ -8,18 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertBadFormat = document.getElementById('alert-bad-format');
     const alertSuccess = document.getElementById('alert-success');
 
+    const fileName = document.getElementById('file-p');
+
     const hideAlerts = () => {
         alertEmpty.style.display = 'none';
         alertBadFormat.style.display = 'none';
         alertSuccess.style.display = 'none';
     };
 
+    file_video.addEventListener('change', async() => {
+        const file = file_video.files[0];
+        if (file) {
+            fileName.textContent = `Video cargado: ${file.name}`;
+        } else {
+            fileName.textContent = 'Haz clic para subir, o arrastra el video aquí';
+        }
+    });
+
     btnProcess.addEventListener('click', async () => {
+
         hideAlerts();
+        btnProcess.disabled = true;
+        btnProcess.textContent = 'Procesando...';
 
         const file = file_video.files[0];
 
-        if (!file){
+        if (!file) {
             alertEmpty.style.display = 'block';
             return;
         }
@@ -32,11 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
 
         reader.onload = async (event) => {
-            
             const base64 = reader.result.split(',')[1];
-
             try {
-                // Simulate a call to the backend API
                 const response = await fetch('http://localhost:5000/process-video', {
                     method: 'POST',
                     headers: {
@@ -50,9 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const data = await response.json();
-                console.log("si es ", data.resumed_text);
                 summary.value = data.resumed_text;
                 alertSuccess.style.display = 'block';
+
+                btnDownload.disabled = false;
 
             } catch (error) {
                 console.error('Error:', error);
@@ -62,8 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnDownload.addEventListener('click', () => {
+
         hideAlerts();
-        
+
+        if (!summary.value) {
+            alertEmpty.style.display = 'block';
+            btnDownload.disabled = true;
+            return; 
+        }
+
         const summaryText = summary.value;
         const blob = new Blob([summaryText], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
