@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertEmpty = document.getElementById('alert-empty');
     const alertBadFormat = document.getElementById('alert-bad-format');
     const alertSuccess = document.getElementById('alert-success');
+    const alertBadServer = document.getElementById('alert-bad-server');
 
     const fileName = document.getElementById('file-p');
 
@@ -14,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
         alertEmpty.style.display = 'none';
         alertBadFormat.style.display = 'none';
         alertSuccess.style.display = 'none';
+        alertBadServer.style.display = 'none';
+    };
+
+    hideAlerts();
+
+    const enableBtnProcess = () => {
+        btnProcess.disabled = false;
+        btnProcess.textContent = 'Procesar Video';
     };
 
     file_video.addEventListener('change', async() => {
@@ -34,18 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = file_video.files[0];
 
         if (!file) {
+            enableBtnProcess();
             alertEmpty.style.display = 'block';
             return;
         }
 
         if (file.type !== 'video/mp4') {
+            enableBtnProcess();
             alertBadFormat.style.display = 'block';
             return;
         }
 
         const reader = new FileReader();
 
-        reader.onload = async (event) => {
+        reader.onload = async () => {
             const base64 = reader.result.split(',')[1];
             try {
                 const response = await fetch('http://localhost:5000/process-video', {
@@ -57,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (!response.ok) {
-                    console.log("error de servidor")
+                    alertBadServer.style.display = 'block';
                 }
 
                 const data = await response.json();
@@ -65,9 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 alertSuccess.style.display = 'block';
 
                 btnDownload.disabled = false;
-
+                enableBtnProcess();
             } catch (error) {
-                console.error('Error:', error);
+                alertBadServer.style.display = 'block';
             }
         };
         reader.readAsDataURL(file);
