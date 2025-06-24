@@ -29,6 +29,6 @@
     color: #000000;
 }
 
-#alert-empty, #alert-bad-format, #alert-success {
+#alert-empty, #alert-bad-format, #alert-success, #alert-bad-server {
     display: none;
 }
